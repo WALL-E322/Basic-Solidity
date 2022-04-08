@@ -1,0 +1,45 @@
+pragma solidity ^0.8.10;
+
+contract ErrorCheck{
+
+    address public ownerAddress;
+    string public Name1 = "Ali";
+    string public Name2 = "Omid";
+    string public Name3 = "Iman";
+
+    uint a = 7;
+    uint b = 8;
+
+    constructor(){
+        ownerAddress = msg.sender; // msg.sender is the person who deploys the contract 
+    }
+
+    modifier checkOwnerAddress(){ //when we want to validate for several times, we use modifiers
+        require(ownerAddress == msg.sender);
+        _;
+    }
+
+    function changeName1() public returns (string memory){
+        require(ownerAddress == msg.sender, "Only the owner can change the name");
+        // this msg.sender could be anyone who joined the site and called the function 
+        Name1 = "Rez";
+        return Name1;
+    }
+
+    function changeName2() public checkOwnerAddress() returns (string memory){
+        Name2 = "Sep";
+        return Name2;
+    }
+
+    function changeName3() public returns (string memory){
+        Name3 = "sed";
+        return Name3;
+    }
+
+    function checkNumber() view returns (uint){
+        uint c = a + b;
+        assert(c > 10);//we used assert becaue we already did some calculations before validating 
+                        // age hamchin sharti bar gharar nabashe khata mide
+        return c;
+    }
+}
