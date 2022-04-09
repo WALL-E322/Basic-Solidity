@@ -1,0 +1,76 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.10;
+
+contract votingSystem{
+    address public deployer;
+    uint8 idCounter = 0;
+    votingPhase votePhase;
+    candidate[] candidates;
+    
+    mapping(address => voter) public votersInfo;
+
+    struct candidate {
+        uint8 ID;
+        uint8 numberOfVotes;//in struct put uint8 close together to use less gas
+        string name;
+    }
+
+    struct voter {
+        string name;
+        uint candidateID;
+        bool voted;
+    }
+
+    enum votingPhase{
+        before,
+        during,
+        later
+    }
+
+    constructor(){
+        deployer = msg.sender;
+        votePhase = votingPhase.before;
+    }
+
+    modifier onlyDeployer(){
+        require(deployer == msg.sender);
+        _;
+    }
+
+    function addCandidate(string memory _name) public onlyDeployer(){
+        require(votePhase == votingPhase.before);
+        candidates.push(candidate(idCounter,0, _name));
+        idCounter++;       
+    }
+
+    function changePhase (uint8 _code) public onlyDeployer(){
+        if (_code == 1){
+            votePhase = votingPhase.during;
+        }
+        else {
+            votePhase = votingPhase.later;
+        }
+    }
+
+    function userVoting (string memory _voterName,uint _candidateId) public{
+        require(votePhase == votingPhase.during);
+        require(votersInfo[msg.sender].voted == false);
+        votersInfo[msg.sender] = voter(_voterName,_candidateId, true);
+        candidates[_candidateId].numberOfVotes++;
+    }
+
+    function getWinner() public view returns (uint8 ,string memory){
+        require(votePhase == votingPhase.later);
+        uint8 max = 0;
+        uint8 winnerId;
+        for (uint8 i =0; i< candidates.length; i++){
+if (candidates[i].numberOfVotes > max ){
+    max = candidates[i].numberOfVotes;
+    winnerId = i;
+}
+        }
+
+        return (winnerId,candidates[winnerId].name);
+    }
+
+}
