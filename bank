@@ -1,0 +1,45 @@
+pragma solidity ^0.8.10;
+
+contract SimpleBank{
+
+    address public ownerAddress;
+    address public contractAddress;
+
+    mapping (address => uint) public Balances;
+
+    constructor(){
+        ownerAddress = msg.sender; // The person who deploys the contract 
+        contractAddress = address(this); // "this" is pointer to the contract and "address(this)" refres to the address of this contract
+    }
+
+    modifier onlyDeployer(){
+        require(ownerAddress == msg.sender, "only the owner of this contract can do this !!");
+        _;
+    }
+
+    modifier setAmountLimit(uint _amount, uint _limit){
+        require(_amount >= _limit );
+        _;
+    } 
+    
+    function setBalances (address _address, uint _amount) public onlyDeployer(){
+        Balances[_address] = _amount;
+    }
+
+    function sendTokenByOwner(address _reciever, uint _amount) public onlyDeployer() {
+        Balances[_reciever] += _amount;
+    }
+
+    function sendTokenByOwnerWithLimit(address _reciever, uint _amount) public setAmountLimit(_amount,7) {
+        // example for modifier with argument (amount sent must be higher than 7)
+        Balances[_reciever] += _amount;
+    }
+
+    function transferToken(address _reciever, uint _amount) public  {
+        require(Balances[msg.sender] >= _amount, "Insufficient funds...");
+        Balances[msg.sender] -= _amount;
+        Balances[_reciever] += _amount;
+
+    }
+
+}
