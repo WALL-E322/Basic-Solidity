@@ -1,0 +1,74 @@
+ // file name = main-object.sol
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+
+contract mainObject{
+
+    string public name;
+
+    constructor(){
+        name = "Omid";
+    }
+
+    function getName() public view returns (string memory){
+        return name;
+    }
+
+}
+
+===========================================================================================
+
+// file name = make-object.sol located in the same folder
+
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+
+import "./main-object.sol" /* ./ -> means that the file is in the same folder
+                               ../ -> we go back for one folder
+                               ../../ -> go back in folders two times */
+
+contract makeObject{
+
+    string name2;
+    function getName(address contractAddress) public returns(string memory){
+        mainObject newObject = mainObject(contractAddress);
+        // return newObject.name()  => one alternative. notice that name is variable but we need those parantheses
+        name2 = newObject.getName();
+        return name2;
+    }
+
+}
+
+======================================================================================================================
+// file name = lib.sol
+
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+
+library Sum{
+
+    function SumTwoNum(uint a, uint b) internal pure returns(uint){
+        return a+b;
+    }
+
+}
+
+===========================================================================================================
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+
+import "./lib.sol" 
+ // import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/math/SafeMath.sol"
+
+contract testSum{
+
+    function sum(uint c, uint d) public pure returns(uint){
+        return Sum.SumTwoNum(c,d);
+        // return SafeMath.tryAdd(c.d); ( function should return bool and uint for this one)
+    }
+
+}
