@@ -1,0 +1,49 @@
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+
+contract simpleToken{
+
+    string public name;
+    string public symbol;
+    uint public price;
+    address public minter;
+    uint public totalSupply;
+    uint8 public decimal;
+
+    mapping (address => uint) public balances;
+
+    event Transfer(address sender, address reciever, uint256 amount);
+
+    constructor(uint256 initialSupply){
+        minter = msg.sender;
+
+        name = "WALL_E322";
+        symbol = "WAL";
+        price = 322 * (10**15);
+        decimal = 18; 
+        
+        totalSupply = initialSupply;
+
+        balances[minter] = initialSupply;
+    }
+
+    modifier onlyMinter() {
+        require(msg.sender == minter, "Only minter can do this !!");
+        _;
+    }
+
+    function mint(address _reciever, uint _amount) public onlyMinter{        
+        balances[_reciever] += _amount;
+        totalSupply +=  _amount;
+    }
+
+    function TransferToken(address _reciever, uint _amount) public {
+        require(balances[msg.sender] > _amount, "insufficient funds...");
+        balances[msg.sender] -= _amount;
+        balances[_reciever] += _amount;
+
+        emit Transfer(msg.sender, _reciever, _amount);
+    }
+
+}
